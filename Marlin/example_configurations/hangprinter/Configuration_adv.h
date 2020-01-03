@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Marlin 3D Printer Firmware
  * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
@@ -237,7 +237,7 @@
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
  */
-#define E0_AUTO_FAN_PIN 7
+#define E0_AUTO_FAN_PIN -1
 #define E1_AUTO_FAN_PIN -1
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
@@ -285,12 +285,13 @@
 
 // @section extras
 
-//#define Z_LATE_ENABLE // Enable Z the last moment. Needed if your Z driver overheats.
+//#define Z_LATE_ENABLE // Enable Z the last moment. Never uncomment this on a Hangprinter.
 
 /**
  * Dual Steppers / Dual Endstops
  *
  * This section will allow you to use extra E drivers to drive a second motor for X, Y, or Z axes.
+ * (A, B, C, or D for Hangprinter).
  *
  * For example, set X_DUAL_STEPPER_DRIVERS setting to use a second motor. If the motors need to
  * spin in opposite directions set INVERT_X2_VS_X_DIR. If the second motor needs its own endstop
@@ -302,6 +303,7 @@
  * in X2. Dual endstop offsets can be set at runtime with 'M666 X<offset> Y<offset> Z<offset>'.
  */
 
+// This is the A motor on Hangprinter
 //#define X_DUAL_STEPPER_DRIVERS
 #if ENABLED(X_DUAL_STEPPER_DRIVERS)
   #define INVERT_X2_VS_X_DIR true   // Set 'true' if X motors should rotate in opposite directions
@@ -312,6 +314,7 @@
   #endif
 #endif
 
+// This is the B motor on Hangprinter
 //#define Y_DUAL_STEPPER_DRIVERS
 #if ENABLED(Y_DUAL_STEPPER_DRIVERS)
   #define INVERT_Y2_VS_Y_DIR true   // Set 'true' if Y motors should rotate in opposite directions
@@ -322,7 +325,8 @@
   #endif
 #endif
 
-#define Z_DUAL_STEPPER_DRIVERS
+// This is the C motor on Hangprinter
+//#define Z_DUAL_STEPPER_DRIVERS
 #if ENABLED(Z_DUAL_STEPPER_DRIVERS)
   //#define Z_DUAL_ENDSTOPS
   #if ENABLED(Z_DUAL_ENDSTOPS)
@@ -384,8 +388,8 @@
 // Homing hits each endstop, retracts by these distances, then does a slower bump.
 #define X_HOME_BUMP_MM 5
 #define Y_HOME_BUMP_MM 5
-#define Z_HOME_BUMP_MM 2
-#define HOMING_BUMP_DIVISOR { 2, 2, 4 }  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
+#define Z_HOME_BUMP_MM 5
+#define HOMING_BUMP_DIVISOR { 10, 10, 10 }  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
 //#define QUICK_HOME                     // If homing includes X and Y, do a diagonal move initially
 
 // When G28 is called, this option will make Y home before X
@@ -405,16 +409,22 @@
 #define INVERT_X_STEP_PIN false
 #define INVERT_Y_STEP_PIN false
 #define INVERT_Z_STEP_PIN false
+#if ENABLED(HANGPRINTER)
+  #define INVERT_A_STEP_PIN false
+  #define INVERT_B_STEP_PIN false
+  #define INVERT_C_STEP_PIN false
+  #define INVERT_D_STEP_PIN false
+#endif
 #define INVERT_E_STEP_PIN false
 
 // Default stepper release if idle. Set to 0 to deactivate.
 // Steppers will shut down DEFAULT_STEPPER_DEACTIVE_TIME seconds after the last move when DISABLE_INACTIVE_? is true.
 // Time can be set by M18 and M84.
-#define DEFAULT_STEPPER_DEACTIVE_TIME 120
-#define DISABLE_INACTIVE_X true
-#define DISABLE_INACTIVE_Y true
-#define DISABLE_INACTIVE_Z true  // set to false if the nozzle will fall down on your printed part when print has finished.
-#define DISABLE_INACTIVE_E true
+#define DEFAULT_STEPPER_DEACTIVE_TIME 60
+#define DISABLE_INACTIVE_X false // Hangprinter is hard coded to never disable its ABCD-motors, even if true would be specified here
+#define DISABLE_INACTIVE_Y false
+#define DISABLE_INACTIVE_Z false
+#define DISABLE_INACTIVE_E true  // Enabling/disabling E-stepper works as normal with Hangprinter
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0
@@ -424,7 +434,8 @@
 // @section lcd
 
 #if ENABLED(ULTIPANEL)
-  #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 60} // Feedrates for manual moves along X, Y, Z, E from panel
+  #define MANUAL_FEEDRATE_XYZ 50*60
+  #define MANUAL_FEEDRATE { MANUAL_FEEDRATE_XYZ, MANUAL_FEEDRATE_XYZ, MANUAL_FEEDRATE_XYZ, 60 } // Feedrates for manual moves along X, Y, Z, E from panel
   #define ULTIPANEL_FEEDMULTIPLY  // Comment to disable setting feedrate multiplier via encoder
 #endif
 
@@ -434,7 +445,8 @@
 #define DEFAULT_MINSEGMENTTIME        20000
 
 // If defined the movements slow down when the look ahead buffer is only half full
-#define SLOWDOWN
+// (don't use SLOWDOWN with DELTA because DELTA generates hundreds of segments per second)
+//#define SLOWDOWN
 
 // Frequency limit
 // See nophead's blog for more info
@@ -460,7 +472,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-#define ADAPTIVE_STEP_SMOOTHING
+//#define ADAPTIVE_STEP_SMOOTHING
 
 // Microstep setting (Only functional when stepper driver microstep pins are connected to MCU.
 #define MICROSTEP_MODES { 16, 16, 16, 16, 16 } // [1,2,4,8,16]
@@ -484,6 +496,8 @@
  *    M907 - applies to all.
  *    M908 - BQ_ZUM_MEGA_3D, RAMBO, PRINTRBOARD_REVF, RIGIDBOARD_V2 & SCOOVO_X9H
  *    M909, M910 & LCD - only PRINTRBOARD_REVF & RIGIDBOARD_V2
+ *
+ *  Hangprinter note: the below arrays might need another element to match ABCD/ABCDE
  */
 //#define PWM_MOTOR_CURRENT { 1300, 1300, 1250 }          // Values in milliamps
 //#define DIGIPOT_MOTOR_CURRENT { 135,135,135,135,135 }   // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
@@ -536,7 +550,6 @@
 //#define LCD_TIMEOUT_TO_STATUS 15000
 
 // Add an 'M73' G-code to set the current percentage
-//robrob
 //#define LCD_SET_PROGRESS_MANUALLY
 
 #if ENABLED(SDSUPPORT) || ENABLED(LCD_SET_PROGRESS_MANUALLY)
@@ -745,14 +758,12 @@
  *
  * Warning: Does not respect endstops!
  */
-//robrob
-#define BABYSTEPPING
+//#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
   //#define BABYSTEP_XY              // Also enable X/Y Babystepping. Not supported on DELTA!
   #define BABYSTEP_INVERT_Z false    // Change if Z babysteps should go the other way
   #define BABYSTEP_MULTIPLICATOR 1   // Babysteps are very small. Increase for faster motion.
-  //robrob
-  #define BABYSTEP_ZPROBE_OFFSET   // Enable to combine M851 and Babystepping
+  //#define BABYSTEP_ZPROBE_OFFSET   // Enable to combine M851 and Babystepping
   //#define DOUBLECLICK_FOR_Z_BABYSTEPPING // Double-click on the Status Screen for Z Babystepping.
   #define DOUBLECLICK_MAX_INTERVAL 1250 // Maximum interval between clicks, in milliseconds.
                                         // Note: Extra time may be added to mitigate controller latency.
@@ -777,11 +788,9 @@
  * See http://marlinfw.org/docs/features/lin_advance.html for full instructions.
  * Mention @Sebastianv650 on GitHub to alert the author of any issues.
  */
-//robrob
-#define LIN_ADVANCE
+//#define LIN_ADVANCE
 #if ENABLED(LIN_ADVANCE)
-  //robrob disable by default, use e.g. M900 K0.22 to activate
-  #define LIN_ADVANCE_K 0     // Unit: mm compression per 1mm/s extruder speed
+  #define LIN_ADVANCE_K 0.22  // Unit: mm compression per 1mm/s extruder speed
   //#define LA_DEBUG          // If enabled, this will generate debug information output over USB.
 #endif
 
@@ -1651,6 +1660,45 @@
 #if ENABLED(NANODLP_Z_SYNC)
   //#define NANODLP_ALL_AXIS  // Enables "Z_move_comp" output on any axis move.
                               // Default behaviour is limited to Z axis only.
+#endif
+
+// @section Mechaduino
+
+#if ENABLED(MECHADUINO_I2C_COMMANDS)
+  #define EXPERIMENTAL_I2CBUS
+  #define I2C_SLAVE_ADDRESS 0 // Do not act as a slave
+  #if ENABLED(HANGPRINTER)
+    #define A_IS_MECHADUINO
+    #define B_IS_MECHADUINO
+    #define C_IS_MECHADUINO
+    #define D_IS_MECHADUINO
+    #define A_MOTOR_I2C_ADDR 0x0A
+    #define B_MOTOR_I2C_ADDR 0x0B
+    #define C_MOTOR_I2C_ADDR 0x0C
+    #define D_MOTOR_I2C_ADDR 0x0D
+    #define A_INVERT_REPORTED_ANGLE false // Angle reports from Mechaduino encoder sent via i2c are used by
+    #define B_INVERT_REPORTED_ANGLE false // M114 S1
+    #define C_INVERT_REPORTED_ANGLE false // which is used in Hangprinter auto anchor localization
+    #define D_INVERT_REPORTED_ANGLE false
+  #else
+    #define X_IS_MECHADUINO
+    #define Y_IS_MECHADUINO
+    #define Z_IS_MECHADUINO
+    #define X_MOTOR_I2C_ADDR 0x0A
+    #define Y_MOTOR_I2C_ADDR 0x0B
+    #define Z_MOTOR_I2C_ADDR 0x0C
+    #define X_INVERT_REPORTED_ANGLE false
+    #define Y_INVERT_REPORTED_ANGLE false
+    #define Z_INVERT_REPORTED_ANGLE false
+  #endif
+  //#define E_IS_MECHADUINO
+  //#define E_MOTOR_I2C_ADDR 0x0E
+  //#define E_INVERT_REPORTED_ANGLE false
+#endif
+
+#if ENABLED(LINE_BUILDUP_COMPENSATION_FEATURE) || ENABLED(MECHADUINO_I2C_COMMANDS)
+  // 1/16 microstepping on 200 step/rev motor gives 16*200=3200 microsteps/rev
+  #define STEPS_PER_MOTOR_REVOLUTION 3200
 #endif
 
 // Enable Marlin dev mode which adds some special commands

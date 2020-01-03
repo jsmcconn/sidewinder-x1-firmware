@@ -69,23 +69,15 @@
 // example_configurations/SCARA and customize for your machine.
 //
 
-//===========================================================================
-//============================= HANGPRINTER =================================
-//===========================================================================
-// For a Hangprinter start with the configuration file in the
-// example_configurations/hangprinter directory and customize for your machine.
-//
-
 // @section info
 
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
-//robrob
-#define STRING_CONFIG_H_AUTHOR "(RobStar, rob3dprint@gmail.com)" // Who made the changes.
-//#define SHOW_BOOTSCREEN
-//#define STRING_SPLASH_LINE1 SHORT_BUILD_VERSION // will be shown during bootup in line 1
-//#define STRING_SPLASH_LINE2 WEBSITE_URL         // will be shown during bootup in line 2
+#define STRING_CONFIG_H_AUTHOR "(indazoo, Huxley v1)" // Who made the changes.
+#define SHOW_BOOTSCREEN
+#define STRING_SPLASH_LINE1 SHORT_BUILD_VERSION // will be shown during bootup in line 1
+#define STRING_SPLASH_LINE2 WEBSITE_URL         // will be shown during bootup in line 2
 
 /**
  * *** VENDORS PLEASE READ ***
@@ -132,13 +124,12 @@
 // The following define selects which electronics board you have.
 // Please choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_MKS_GEN_L
+  #define MOTHERBOARD BOARD_SANGUINOLOLU_12
 #endif
 
 // Optional custom name for your RepStrap or other custom machine
 // Displayed in the LCD "Ready" message
-//robrob
-#define CUSTOM_MACHINE_NAME "SideWinderX1"
+#define CUSTOM_MACHINE_NAME "Huxley"
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
@@ -317,7 +308,7 @@
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_4 0
-#define TEMP_SENSOR_BED 1
+#define TEMP_SENSOR_BED 1 // Sanguinololu v1.3 with 4.7kOhm pullup
 #define TEMP_SENSOR_CHAMBER 0
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
@@ -331,7 +322,7 @@
 
 // Extruder temperature must be close to target for this long before M109 returns success
 #define TEMP_RESIDENCY_TIME 10  // (seconds)
-#define TEMP_HYSTERESIS 5       // (degC) range of +/- temperatures considered "close" to the target one
+#define TEMP_HYSTERESIS 3       // (degC) range of +/- temperatures considered "close" to the target one
 #define TEMP_WINDOW     1       // (degC) Window around target to start the residency timer x degC early.
 
 // Bed temperature must be close to target for this long before M190 returns success
@@ -376,25 +367,15 @@
   //#define SLOW_PWM_HEATERS // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
   //#define PID_PARAMS_PER_HOTEND // Uses separate PID parameters for each extruder (useful for mismatched extruders)
                                   // Set/get with gcode: M301 E[extruder number, 0-2]
-
-  #define PID_FUNCTIONAL_RANGE 35 //robrob: changed from 10 to 35 as the volcano hotend is overshooting too much and the tuning will be cancled
-                                  // If the temperature difference between the target temperature and the actual temperature
+  #define PID_FUNCTIONAL_RANGE 10 // If the temperature difference between the target temperature and the actual temperature
                                   // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
 
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 
-  //robrob: ran on my sidewinder with M303 S215 C8 having the stock Volcano and Nozzle
-  //robrob: run M301 P12.46 I0.95 D41.10 to set values, after that run M500 to save vales to eeprom
-  //after flashing firmware run: M502 Reset current settings to defaults, as set in Configurations.h. Follow with M500 to store in EEPROM
-  #define DEFAULT_Kp 12.46
-  #define DEFAULT_Ki 0.95
-  #define DEFAULT_Kd 41.10
-
-  //sidewinder X1 with 1.0mm Nozzle
-  // M301 P13.53 I1.10 D41.57;
-  //#define DEFAULT_Kp 13.53
-  //#define DEFAULT_Ki 1.10
-  //#define DEFAULT_Kd 41.57
+  // Ultimaker
+  #define DEFAULT_Kp 22.2
+  #define DEFAULT_Ki 1.08
+  #define DEFAULT_Kd 114
 
   // MakerGear
   //#define DEFAULT_Kp 7.0
@@ -425,7 +406,7 @@
  * heater. If your configuration is significantly different than this and you don't understand
  * the issues involved, don't use bed PID until someone else verifies that your hardware works.
  */
-#define PIDTEMPBED
+//#define PIDTEMPBED
 
 //#define BED_LIMIT_SWITCHING
 
@@ -443,11 +424,9 @@
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-  //robrob: ran on my sidewinder with M303 E-1 S70 C8
-  //robrob: run M304 P146.51 I18.44 D291.07 to set values, after that run M500 to save vales to eeprom
-  #define DEFAULT_bedKp 146.51
-  #define DEFAULT_bedKi 18.44
-  #define DEFAULT_bedKd 291.07
+  #define DEFAULT_bedKp 10.00
+  #define DEFAULT_bedKi .023
+  #define DEFAULT_bedKd 305.4
 
   //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   //from pidautotune
@@ -542,14 +521,13 @@
 #endif
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-#define X_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
-#define Y_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING true // set to true to invert the logic of the endstop.
+#define X_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+#define Y_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
+#define Z_MIN_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define X_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define Y_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
 #define Z_MAX_ENDSTOP_INVERTING false // set to true to invert the logic of the endstop.
-//robrob set to true to match X_MIN_ENDSTOP_INVERTING
-#define Z_MIN_PROBE_ENDSTOP_INVERTING true // set to true to invert the logic of the probe.
+#define Z_MIN_PROBE_ENDSTOP_INVERTING false // set to true to invert the logic of the probe.
 
 /**
  * Stepper Drivers
@@ -565,17 +543,17 @@
  *          TMC5130, TMC5130_STANDALONE
  * :['A4988', 'DRV8825', 'LV8729', 'L6470', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE']
  */
-#define X_DRIVER_TYPE  TMC2100
-#define Y_DRIVER_TYPE  TMC2100
-#define Z_DRIVER_TYPE  TMC2100
-//#define X2_DRIVER_TYPE TMC2100
-//#define Y2_DRIVER_TYPE TMC2100
-#define Z2_DRIVER_TYPE TMC2100
-#define E0_DRIVER_TYPE TMC2100
-//#define E1_DRIVER_TYPE TMC2100
-//#define E2_DRIVER_TYPE TMC2100
-//#define E3_DRIVER_TYPE TMC2100
-//#define E4_DRIVER_TYPE TMC2100
+//#define X_DRIVER_TYPE  A4988
+//#define Y_DRIVER_TYPE  A4988
+//#define Z_DRIVER_TYPE  A4988
+//#define X2_DRIVER_TYPE A4988
+//#define Y2_DRIVER_TYPE A4988
+//#define Z2_DRIVER_TYPE A4988
+//#define E0_DRIVER_TYPE A4988
+//#define E1_DRIVER_TYPE A4988
+//#define E2_DRIVER_TYPE A4988
+//#define E3_DRIVER_TYPE A4988
+//#define E4_DRIVER_TYPE A4988
 
 // Enable this feature if all enabled endstop pins are interrupt-capable.
 // This will remove the need to poll the interrupt pins, saving many CPU cycles.
@@ -596,7 +574,7 @@
  * (This feature is not required for common micro-switches mounted on PCBs
  * based on the Makerbot design, since they already include the 100nF capacitor.)
  */
-#define ENDSTOP_NOISE_FILTER
+//#define ENDSTOP_NOISE_FILTER
 
 //=============================================================================
 //============================== Movement Settings ============================
@@ -611,6 +589,45 @@
  * Note that if EEPROM is enabled, saved values will override these.
  */
 
+//
+// Standard NEMA 17 with T2 belt and 20 tooth pulley
+//
+#define NEMA17_FULL_STEPS 200.0
+#define XY_MICROSTEPS 16.0
+#define E_MICROSTEPS 16.0
+#define Z_MICROSTEPS 16.0
+
+/* RepRapPro belts
+http://forums.reprap.org/read.php?1,391198
+White polyurethane belt(T2.5), 14 - tooth printed pulley : 91.4286 step per mm (Original Huxley, Legacy Mendel)
+Black rubber belt(MXL), 17 - tooth printed pulley : 92.635 step per mm (Huxley, Mendel Mono and Tri since 1 / 4 / 2013)
+Black rubber belt(MXL), 18 - tooth aluminium pulley : 87.489 step per mm (Huxley, Mendel Mono and Tri since 1 / 1 / 2014)
+*/
+#define XY_PULLEY_PITCH 2.5   //RepRapPro Huxley has T2.5 belts
+#define XY_PULLEY_TEETH 14.0  //RepRapPro Huxley has 14 teeth pulleys
+
+//
+// Standard NEMA 17 with fancy 5mm lead screws
+//
+#define Z_RODS_PITCH 0.8
+
+#define XY_MOTOR_STEPS (NEMA17_FULL_STEPS * XY_MICROSTEPS)
+#define Z_MOTOR_STEPS (NEMA17_FULL_STEPS * Z_MICROSTEPS)
+#define E_MOTOR_STEPS (NEMA17_FULL_STEPS * E_MICROSTEPS)
+
+//
+// MK7 Direct Drive
+//
+#define E_MOTOR_GEAR_TEETH 11.0 //Num of teeth of gear on extruder motor
+#define E_ROD_GEAR_TEETH 53.0   //Num of teeth of gear driving the extruder rod
+#define E_ROD_DIAM 5.4 // ca value. M6 rod drives the filament. Manual calibration needed.
+#define E_ROD_CIRC (M_PI * E_ROD_DIAM)
+#define E_STEPS (E_MOTOR_STEPS / (E_MOTOR_GEAR_TEETH/E_ROD_GEAR_TEETH) / E_ROD_CIRC)
+
+// Get steps/mm from selected results above
+#define XY_STEPS (XY_MOTOR_STEPS / (XY_PULLEY_PITCH * XY_PULLEY_TEETH))
+#define Z_STEPS (Z_MOTOR_STEPS / Z_RODS_PITCH)
+
 /**
  * With this option each E stepper can have its own factors for the
  * following movement settings. If fewer factors are given than the
@@ -623,14 +640,15 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80.121, 80.121, 399.778, 445 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { XY_STEPS, XY_STEPS, Z_STEPS, E_STEPS }
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 300, 300, 50, 40 }
+#define DEFAULT_MAX_Z_FEEDRATE        3.3 // older Huxley has problem with speeds > 3.3 mm/s on z axis
+#define DEFAULT_MAX_FEEDRATE          { 200, 200, DEFAULT_MAX_Z_FEEDRATE, 25 }
 
 /**
  * Default Max Acceleration (change/s) change = mm/s
@@ -638,7 +656,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 2000, 2000, 100, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 1000, 1000, 50, 1000 }
 
 /**
  * Default Acceleration (change/s) change = mm/s
@@ -648,9 +666,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          800    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  10000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   2000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  1000    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk (mm/s)
@@ -660,10 +678,10 @@
  * When changing speed and direction, if the difference is less than the
  * value set here, it may happen instantaneously.
  */
-#define DEFAULT_XJERK                 8.0
-#define DEFAULT_YJERK                 8.0
-#define DEFAULT_ZJERK                 0.3
-#define DEFAULT_EJERK                 5.0
+#define DEFAULT_XJERK                 10.0
+#define DEFAULT_YJERK                 10.0
+#define DEFAULT_ZJERK                  0.3
+#define DEFAULT_EJERK                  5.0
 
 /**
  * S-Curve Acceleration
@@ -673,7 +691,7 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-#define S_CURVE_ACCELERATION
+//#define S_CURVE_ACCELERATION
 
 //===========================================================================
 //============================= Z Probe Options =============================
@@ -731,8 +749,7 @@
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
  *   (e.g., an inductive probe or a nozzle-based probe-switch.)
  */
-//robrob (although we are having NO probe on our x1, I want the Babysteps to get storted in Z_Probe_Offset, verify with M851)
-#define FIX_MOUNTED_PROBE
+//#define FIX_MOUNTED_PROBE
 
 /**
  * Z Servo Probe, such as an endstop switch on a rotating arm.
@@ -839,8 +856,7 @@
 #define Z_PROBE_OFFSET_RANGE_MAX 20
 
 // Enable the M48 repeatability test to test probe accuracy
-//robrob want to check how exact the endstop of the sidewinder x1 is :-)
-#define Z_MIN_PROBE_REPEATABILITY_TEST
+//#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
 // :{ 0:'Low', 1:'High' }
@@ -865,14 +881,14 @@
 // @section machine
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
-#define INVERT_X_DIR false
+#define INVERT_X_DIR true
 #define INVERT_Y_DIR false
-#define INVERT_Z_DIR true
+#define INVERT_Z_DIR false
 
 // @section extruder
 
 // For direct drive extruder v9 set to true, for geared extruder set to false.
-#define INVERT_E0_DIR false
+#define INVERT_E0_DIR true
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define INVERT_E3_DIR false
@@ -884,7 +900,7 @@
 
 //#define UNKNOWN_Z_NO_RAISE // Don't raise Z (lower the bed) if Z is "unknown." For beds that fall when Z is powered off.
 
-//#define Z_HOMING_HEIGHT 4  // (in mm) Minimal z height before homing (G28) for Z clearance above the bed, clamps, ...
+#define Z_HOMING_HEIGHT 4    // (in mm) Minimal z height before homing (G28) for Z clearance above the bed, clamps, ...
                              // Be sure you have this distance over your Z_MAX_POS in case.
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
@@ -896,16 +912,25 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 300
-#define Y_BED_SIZE 310
+// http://reprap.org/wiki/Configuring_Marlin_Bed_Dimensions
+// http://marlinfw.org/docs/configuration/configuration.html#movement-bounds
+#define X_BED_SIZE 140
+#define Y_BED_SIZE 140
+// Huxley with 110x110 PEI board.
+//#define X_BED_SIZE 108
+//#define Y_BED_SIZE 108
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS -2
+#define X_MIN_POS -9
 #define Y_MIN_POS -5
+// Huxley with 110x110 PEI board.
+//#define X_MIN_POS -25
+//#define Y_MIN_POS -21
 #define Z_MIN_POS 0
+
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
-#define Z_MAX_POS 400
+#define Z_MAX_POS 80
 
 /**
  * Software Endstops
@@ -1166,8 +1191,8 @@
 #endif
 
 // Homing speeds (mm/m)
-#define HOMING_FEEDRATE_XY (80*60)
-#define HOMING_FEEDRATE_Z  (20*60)
+#define HOMING_FEEDRATE_XY (50*60)
+#define HOMING_FEEDRATE_Z  (DEFAULT_MAX_Z_FEEDRATE*60)
 
 // @section calibrate
 
@@ -1240,8 +1265,7 @@
 // M501 - reads parameters from EEPROM (if you need reset them after you changed them temporarily).
 // M502 - reverts to the default "factory settings".  You still need to store them in EEPROM afterwards if you want to.
 //
-//robrob, lets store our setting permanently
-#define EEPROM_SETTINGS // Enable for M500 and M501 commands
+#define EEPROM_SETTINGS   // Enable for M500 and M501 commands
 //#define DISABLE_M503    // Saves ~2700 bytes of PROGMEM. Disable for release!
 #define EEPROM_CHITCHAT   // Give feedback on EEPROM commands. Disable to save PROGMEM.
 
@@ -1297,8 +1321,8 @@
 #if ENABLED(NOZZLE_PARK_FEATURE)
   // Specify a park position as { X, Y, Z }
   #define NOZZLE_PARK_POINT { (X_MIN_POS + 10), (Y_MAX_POS - 10), 20 }
-  #define NOZZLE_PARK_XY_FEEDRATE 100   // X and Y axes feedrate in mm/s (also used for delta printers Z axis)
-  #define NOZZLE_PARK_Z_FEEDRATE 5      // Z axis feedrate in mm/s (not used for delta printers)
+  #define NOZZLE_PARK_XY_FEEDRATE 100                        // X and Y axes feedrate in mm/s (also used for delta printers Z axis)
+  #define NOZZLE_PARK_Z_FEEDRATE DEFAULT_MAX_Z_FEEDRATE      // Z axis feedrate in mm/s (not used for delta printers)
 #endif
 
 /**
@@ -1884,13 +1908,13 @@
  * LED Type. Enable only one of the following two options.
  *
  */
-#define RGB_LED
+//#define RGB_LED
 //#define RGBW_LED
 
 #if ENABLED(RGB_LED) || ENABLED(RGBW_LED)
-  #define RGB_LED_R_PIN 5
-  #define RGB_LED_G_PIN 4
-  #define RGB_LED_B_PIN 6
+  #define RGB_LED_R_PIN 34
+  #define RGB_LED_G_PIN 43
+  #define RGB_LED_B_PIN 35
   #define RGB_LED_W_PIN -1
 #endif
 
